@@ -258,6 +258,21 @@ export const ARTICLE_DATA = [
     }
   },
   {
+    id: 'a16',
+    common: {
+      category: ArticleCategory.DIT,
+      link: 'https://mp.weixin.qq.com/s/r3aEEmZhOiHRPPJpxQmeHQ',
+      coverImage: 'https://lun3cy.notion.site/image/attachment%3Ad7022488-9838-4218-b0b7-e75f85b5de18%3A%E5%91%A8%E6%8A%A5%E5%B0%81%E9%9D%A2.png?table=block&id=2c4f4f61-90b0-80c9-afbf-de2e6c571bf4&spaceId=bfa23b18-0167-4223-aea0-06f1efb0e882&width=1420&userId=&cache=v2',
+      date: '2025-12-09'
+    },
+    zh: {
+      title: '个人周报 | 25/12/01~25/12/07',
+    },
+    en: {
+      title: 'Weekly Report | 25/12/01~25/12/07',
+    }
+  },
+  {
     id: 'l1',
     common: {
       category: ArticleCategory.LUNA,
@@ -383,7 +398,7 @@ export const ARTICLE_DATA = [
       category: ArticleCategory.TALK,
       link: 'https://mp.weixin.qq.com/s/x2QdGPw6DPwAQZJ7tK1wlg',
       coverImage: 'https://mmbiz.qpic.cn/mmbiz_png/MpZIibj0bjSzbicdESgIxHiblia9DVUCTHYxWjZf6XMCFKgnia6a6EGceJ0eslakia8HACD6DmnXHq4SSlXQniayMwfkQ/640?wx_fmt=png&from=appmsg',
-      date: '20245-10-15'
+      date: '2025-10-15'
     },
     zh: {
       title: '瞎叨be叨 | 5.自用华师美食菜单放送',
