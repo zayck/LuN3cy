@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom';
 import { PROJECTS, CATEGORY_LABELS } from '../constants';
 import { Category, Language, Project } from '../types';
 import { PHOTOGRAPHY_GALLERY } from '../src/data/photography';
-import { ArrowUpRight, X, Terminal, MessageCircle, IdCard, Github, ExternalLink } from 'lucide-react';
+import { ArrowUpRight, X, Terminal, MessageCircle, IdCard, Github, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PortfolioSectionProps {
   language: Language;
@@ -18,6 +18,11 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ language, ex
   const [displayProject, setDisplayProject] = useState<Project | null>(null);
   const [isModalRendered, setIsModalRendered] = useState(false);
   
+  // Lightbox State
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
   // Sync with external filter if provided
   useEffect(() => {
     if (externalFilter) {
@@ -48,10 +53,62 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ language, ex
       const timer = setTimeout(() => {
         setIsModalRendered(false);
         setDisplayProject(null);
+        setLightboxIndex(null); // Close lightbox when modal closes
       }, 300);
       return () => clearTimeout(timer);
     }
   }, [selectedProject]);
+
+  // Derived Gallery for Lightbox
+  const currentGallery = displayProject 
+    ? (displayProject.gallery || PHOTOGRAPHY_GALLERY[displayProject.id] || []) 
+    : [];
+
+  // Lightbox Navigation
+  const handlePrev = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (lightboxIndex !== null && currentGallery.length > 0) {
+      setLightboxIndex((prev) => (prev! - 1 + currentGallery.length) % currentGallery.length);
+    }
+  };
+
+  const handleNext = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (lightboxIndex !== null && currentGallery.length > 0) {
+      setLightboxIndex((prev) => (prev! + 1) % currentGallery.length);
+    }
+  };
+
+  // Keyboard Navigation for Lightbox
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (lightboxIndex === null) return;
+      
+      if (e.key === 'ArrowLeft') handlePrev();
+      if (e.key === 'ArrowRight') handleNext();
+      if (e.key === 'Escape') setLightboxIndex(null);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxIndex, currentGallery.length]);
+
+  // Swipe Handlers
+  const minSwipeDistance = 50;
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+  const onTouchMove = (e: React.TouchEvent) => setTouchEnd(e.targetTouches[0].clientX);
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (isLeftSwipe) handleNext();
+    if (isRightSwipe) handlePrev();
+  };
 
   return (
     <div className="w-full max-w-[96vw] mx-auto pb-20">
@@ -83,7 +140,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ language, ex
         {filteredProjects.map((project) => (
           <div 
             key={project.id} 
-            className={`group cursor-pointer flex flex-col h-full transform-gpu ${project.category === Category.DEV ? 'bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-3xl p-8 hover:shadow-xl hover:-translate-y-2 transition-all duration-300' : ''}`}
+            className={`group cursor-pointer flex flex-col h-full transform-gpu ${project.category === Category.DEV ? 'bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-2xl p-8 hover:shadow-xl hover:-translate-y-2 transition-all duration-300' : ''}`}
             onClick={() => setSelectedProject(project)}
           >
             
@@ -114,7 +171,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ language, ex
                // STANDARD CARD LAYOUT
                <>
                   {/* Image container */}
-                  <div className="w-full aspect-[4/3] bg-gray-100 dark:bg-gray-800 mb-6 overflow-hidden rounded-[2rem] relative shadow-none border border-transparent transition-all duration-500 group-hover:shadow-2xl dark:group-hover:shadow-none dark:group-hover:border-white/20 transform-gpu">
+                  <div className="w-full aspect-[4/3] bg-gray-100 dark:bg-gray-800 mb-6 overflow-hidden rounded-2xl relative shadow-none border border-transparent transition-all duration-500 group-hover:shadow-2xl dark:group-hover:shadow-none dark:group-hover:border-white/20 transform-gpu">
                     {project.image && !project.image.includes('picsum') ? (
                         <img 
                           src={project.image} 
@@ -185,24 +242,60 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ language, ex
       {/* PROJECT DETAIL MODAL */}
       {isModalRendered && createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8">
-           {/* Lightbox Overlay (Hidden by default) */}
-           <div 
-             id="lightbox-overlay"
-             className="fixed inset-0 z-[200] bg-black/90 hidden items-center justify-center p-4 cursor-zoom-out"
-             onClick={(e) => {
-               e.stopPropagation();
-               const lightbox = document.getElementById('lightbox-overlay');
-               if (lightbox) {
-                 lightbox.classList.add('hidden');
-                 lightbox.classList.remove('flex');
-               }
-             }}
-           >
-              <img id="lightbox-img" src="" alt="Full View" className="max-w-full max-h-full object-contain shadow-2xl" />
-              <button className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors">
-                <X size={32} />
-              </button>
-           </div>
+           {/* Lightbox Overlay */}
+           {lightboxIndex !== null && (
+             <div 
+               className="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-4 md:p-12 animate-[fadeIn_0.3s_ease-out_forwards]"
+               onClick={() => setLightboxIndex(null)}
+               onTouchStart={onTouchStart}
+               onTouchMove={onTouchMove}
+               onTouchEnd={onTouchEnd}
+             >
+                <div 
+                  className="relative max-w-full max-h-full w-full h-full flex items-center justify-center animate-message-pop"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <img 
+                    src={currentGallery[lightboxIndex]} 
+                    alt="Full View" 
+                    className="max-w-full max-h-full object-contain shadow-2xl rounded-lg select-none"
+                    referrerPolicy="no-referrer"
+                    draggable={false}
+                  />
+                  
+                  {/* Close Button */}
+                  <button 
+                    className="absolute top-4 right-4 md:top-0 md:right-0 md:-mt-12 md:-mr-12 text-white/50 hover:text-white transition-colors p-2"
+                    onClick={() => setLightboxIndex(null)}
+                  >
+                    <X size={32} />
+                  </button>
+
+                  {/* Navigation Buttons */}
+                  {currentGallery.length > 1 && (
+                    <>
+                      <button 
+                        className="absolute left-2 md:-left-16 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors p-2 bg-black/20 hover:bg-black/40 rounded-full md:bg-transparent"
+                        onClick={handlePrev}
+                      >
+                        <ChevronLeft size={48} />
+                      </button>
+                      <button 
+                        className="absolute right-2 md:-right-16 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors p-2 bg-black/20 hover:bg-black/40 rounded-full md:bg-transparent"
+                        onClick={handleNext}
+                      >
+                        <ChevronRight size={48} />
+                      </button>
+                    </>
+                  )}
+                  
+                  {/* Counter */}
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/70 font-mono text-sm bg-black/50 px-3 py-1 rounded-full">
+                    {lightboxIndex + 1} / {currentGallery.length}
+                  </div>
+                </div>
+             </div>
+           )}
 
            {/* Backdrop - Use solid color opacity instead of blur for performance */}
            <div 
@@ -249,13 +342,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ language, ex
                                             className="aspect-square overflow-hidden cursor-zoom-in relative group rounded-lg shadow-sm hover:shadow-md will-change-transform transform-gpu"
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                const lightbox = document.getElementById('lightbox-overlay');
-                                                const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement;
-                                                if (lightbox && lightboxImg) {
-                                                    lightboxImg.src = item;
-                                                    lightbox.classList.remove('hidden');
-                                                    lightbox.classList.add('flex');
-                                                }
+                                                setLightboxIndex(idx);
                                             }}
                                         >
                                             <img 
