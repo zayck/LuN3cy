@@ -62,12 +62,6 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ initialVisible = false
 
   const [isClosing, setIsClosing] = useState(false);
 
-  useEffect(() => {
-    if (initialVisible) {
-      setIsOpen(true);
-    }
-  }, [initialVisible]);
-
   const handleClose = () => {
     setIsClosing(true);
     setTimeout(() => {
@@ -96,14 +90,6 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ initialVisible = false
     if (accept) {
       setIsOpen(true);
       setIsPlaying(true);
-    }
-  };
-
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseFloat(e.target.value);
-    setVolume(newVolume);
-    if (newVolume > 0 && isMuted) {
-      setIsMuted(false);
     }
   };
 
@@ -144,21 +130,27 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ initialVisible = false
           .replace(':id', METING_CONFIG.id)
           .replace(':r', Math.random().toString());
 
+        console.log('Fetching music from:', apiUrl);
         const response = await fetch(apiUrl);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
 
-        // Transform API response to Song interface
+        // Transform API response to Song interface - Fixed field mapping
         const playlist: Song[] = data.map((song: any, index: number) => ({
           id: song.id || index,
-          title: song.name,
-          artist: song.artist,
-          cover: song.pic,
+          title: song.title || 'Unknown Title',
+          artist: song.author || 'Unknown Artist',
+          cover: song.pic || '',
           url: song.url
         }));
 
         setMusicPlaylist(playlist);
     
-        // 添加这一行：确保有歌曲时重置到第一首
+        // Ensure we start at the first song when playlist is loaded
         if (playlist.length > 0) {
           setCurrentSongIndex(0);
         }
@@ -174,19 +166,26 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ initialVisible = false
                 .replace(':type', METING_CONFIG.type)
                 .replace(':id', METING_CONFIG.id);
 
+              console.log('Trying fallback API:', apiUrl);
               const response = await fetch(apiUrl);
+              
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              
               const data = await response.json();
 
+              // Transform API response to Song interface - Fixed field mapping
               const playlist: Song[] = data.map((song: any, index: number) => ({
                 id: song.id || index,
-                title: song.name,
-                artist: song.artist,
-                cover: song.pic,
+                title: song.title || 'Unknown Title',
+                artist: song.author || 'Unknown Artist',
+                cover: song.pic || '',
                 url: song.url
               }));
 
               setMusicPlaylist(playlist);
-              // 添加这一行：确保有歌曲时重置到第一首
+              // Ensure we start at the first song when playlist is loaded
               if (playlist.length > 0) {
                 setCurrentSongIndex(0);
               }
@@ -202,26 +201,6 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ initialVisible = false
 
     fetchMusicPlaylist();
   }, []);
-
-  // 修复：完善播放列表变化的处理逻辑
-  useEffect(() => {
-    // 当播放列表从空变为有歌曲时，设置当前索引为0
-    if (musicPlaylist.length > 0) {
-      // 确保当前索引在有效范围内
-      if (currentSongIndex >= musicPlaylist.length) {
-        setCurrentSongIndex(0);
-      }
-      // 或者直接强制设置为第一首，确保始终有歌曲显示
-      setCurrentSongIndex(0);
-    }
-  }, [musicPlaylist]);
-
-
-  // Get direct MP3 url using the Meting API pattern
-  const getSongUrl = (song: Song) => {
-    if (song.url) return song.url;
-    return '';
-  };
 
   // Ensure audio is properly disposed only when component unmounts
   useEffect(() => {
@@ -239,7 +218,7 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ initialVisible = false
       {currentSong && (
         <audio 
           ref={audioRef}
-          src={getSongUrl(currentSong)}
+          src={currentSong.url || ''}
           crossOrigin="anonymous"
           onTimeUpdate={(e) => {
               if (!isSeeking) {
@@ -317,6 +296,18 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ initialVisible = false
                     src={currentSong.cover} 
                     alt={currentSong.title}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      // Fallback if image fails to load
+                      const imgElement = e.target as HTMLImageElement;
+                      imgElement.style.display = 'none';
+                      const parent = imgElement.parentElement;
+                      if (parent) {
+                        parent.innerHTML = '<Music className="w-10 h-10 text-zinc-400 m-auto" />';
+                        parent.style.display = 'flex';
+                        parent.style.alignItems = 'center';
+                        parent.style.justifyContent = 'center';
+                      }
+                    }}
                   />
                 </div>
                 <div className="flex flex-col justify-center min-w-0">
@@ -415,9 +406,9 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ initialVisible = false
         .animate-spin-slow {
           animation: spin-slow 8s linear infinite;
         }
-        @keyframes progress {
-          0% { width: 0%; }
-          100% { width: 100%; }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.8; }
         }
         .animate-pulse-slow {
           animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -440,3 +431,5 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ initialVisible = false
     </div>
   );
 };
+
+export default MusicPlayer;
