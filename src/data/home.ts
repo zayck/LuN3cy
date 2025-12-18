@@ -16,12 +16,12 @@ export interface HomeContent {
 export const HOME_DATA: Record<Language, HomeContent> = {
   zh: {
     heroItems: [
-      { text: "摄影摄像", annotation: "（作品积累较多）", category: Category.VIDEO },
-      { text: "平面交互", annotation: "（当前主攻，兴趣所在）", category: Category.DESIGN },
+      { text: "少阳手记", annotation: "（作品积累较多）", category: Category.VIDEO },
+      { text: "少阳研究所", annotation: "（当前主攻，兴趣所在）", category: Category.DESIGN },
       { text: "应用开发", annotation: "（vibe builder）", category: Category.DEV },
-      { text: "炒粉炒饭", annotation: "（还在学）", category: null }
+      { text: "中医证书", annotation: "（考取中）", category: null }
     ],
-    intro: "不懂设计的摄影师不是一个好的产品经理。|边学边做，MVP生活，迈向全栈，但更看重实际价值。",
+    intro: "一个技能树越点越歪的个人博主。|边学边做，MVP生活，迈向躺赚，但更看重实际价值。",
     selectedWorks: "精选作品",
     years: "[ 2021 — 2025 ]"
   },

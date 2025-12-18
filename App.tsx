@@ -7,7 +7,7 @@ import { PortfolioSection } from './components/PortfolioSection';
 import { ArticleSection } from './components/ArticleSection';
 import { TimelineSection } from './components/TimelineSection';
 import { MusicPlayer } from './components/MusicPlayer';
-import { Mail, MapPin, RotateCcw, MessageSquare, Instagram, Youtube, FileText, Aperture, Github } from 'lucide-react';
+import { Mail, MapPin, RotateCcw, MessageCircle, Instagram, Tv, FileText, Aperture, Github } from 'lucide-react';
 import { NAV_ITEMS } from './src/data/navigation';
 import { CONTACT_DATA } from './src/data/contact';
 import { ARTICLES_PAGE_DATA } from './src/data/articles';
@@ -411,7 +411,7 @@ function App() {
                  {/* Socials - WeChat */}
                  <div 
                     className="block p-12 border-2 border-gray-100 dark:border-gray-800 rounded-[2rem] hover:border-[#07C160] transition-colors duration-300 group cursor-pointer relative"
-                    onClick={() => window.open('https://mp.weixin.qq.com/s/MD5T-BsAgUi9yUo6ISY1CA', '_blank')}
+                    onClick={() => window.open('https://mp.weixin.qq.com/s/eSMLs8lNVw_dOEamsXIw-Q', '_blank')}
                     onMouseEnter={(e) => {
                        const tooltip = document.getElementById('wechat-tooltip');
                        if (tooltip) {
@@ -437,7 +437,7 @@ function App() {
                        }
                     }}
                  >
-                    <MessageSquare size={48} className="mx-auto mb-6 text-gray-400 group-hover:text-[#07C160] transition-colors duration-300" />
+                    <MessageCircle size={48} className="mx-auto mb-6 text-gray-400 group-hover:text-[#07C160] transition-colors duration-300" />
                     <h3 className="text-2xl font-bold mb-2 text-black dark:text-white transition-colors duration-300">
                       {language === 'zh' ? '公众号' : 'WeChat'}
                     </h3>
@@ -461,7 +461,7 @@ function App() {
                  {/* Socials - Xiaohongshu */}
                  <div 
                     className="block p-12 border-2 border-gray-100 dark:border-gray-800 rounded-[2rem] hover:border-[#EC4048] transition-colors duration-300 group cursor-pointer relative"
-                    onClick={() => window.open('https://www.xiaohongshu.com/user/profile/61bbb882000000001000e80d', '_blank')}
+                    onClick={() => window.open('https://www.xiaohongshu.com/user/profile/682700d4000000000e01dbef', '_blank')}
                     onMouseEnter={(e) => {
                        const tooltip = document.getElementById('red-tooltip');
                        if (tooltip) {
@@ -511,7 +511,7 @@ function App() {
                  {/* Socials - Bilibili */}
                  <div 
                     className="block p-12 border-2 border-gray-100 dark:border-gray-800 rounded-[2rem] hover:border-[#00AEEC] transition-colors duration-300 group cursor-pointer relative"
-                    onClick={() => window.open('https://b23.tv/XNNX02Q', '_blank')}
+                    onClick={() => window.open('https://space.bilibili.com/341981702', '_blank')}
                     onMouseEnter={(e) => {
                        const tooltip = document.getElementById('bili-tooltip');
                        if (tooltip) {
@@ -537,7 +537,7 @@ function App() {
                        }
                     }}
                  >
-                    <Youtube size={48} className="mx-auto mb-6 text-gray-400 group-hover:text-[#00AEEC] transition-colors duration-300" />
+                    <Tv size={48} className="mx-auto mb-6 text-gray-400 group-hover:text-[#00AEEC] transition-colors duration-300" />
                     <h3 className="text-2xl font-bold mb-2 text-black dark:text-white transition-colors duration-300">
                       Bilibili
                     </h3>
@@ -553,15 +553,15 @@ function App() {
                     >
                        <p className="text-sm font-bold text-black dark:text-white opacity-80 px-4 text-center">
                           Click to view profile<br/>
-                          <span className="text-xs opacity-50 font-mono">b23.tv/XNNX02Q</span>
+                          <span className="text-xs opacity-50 font-mono">bilibili.com</span>
                        </p>
                     </div>
                  </div>
 
-                 {/* Socials - 500px */}
+                 {/* Socials - Blog */}
                  <div 
                     className="block p-12 border-2 border-gray-100 dark:border-gray-800 rounded-[2rem] hover:border-black dark:hover:border-white transition-colors duration-300 group cursor-pointer relative"
-                    onClick={() => window.open('https://500px.com.cn/LuN3cy', '_blank')}
+                    onClick={() => window.open('https://zayck.pages.dev', '_blank')}
                     onMouseEnter={(e) => {
                        const tooltip = document.getElementById('px-tooltip');
                        if (tooltip) {
@@ -589,7 +589,7 @@ function App() {
                  >
                     <Aperture size={48} className="mx-auto mb-6 text-gray-400 group-hover:text-black dark:group-hover:text-white transition-colors duration-300" />
                     <h3 className="text-2xl font-bold mb-2 text-black dark:text-white transition-colors duration-300">
-                      500px
+                      Blog
                     </h3>
                     <p className="text-lg opacity-70 text-gray-500 dark:text-gray-400 transition-colors duration-300">
                       {content.socials?.px500 || 'LuN3cy'}
@@ -603,7 +603,7 @@ function App() {
                     >
                        <p className="text-sm font-bold text-black dark:text-white opacity-80 px-4 text-center">
                           Click to view profile<br/>
-                          <span className="text-xs opacity-50 font-mono">500px.com.cn</span>
+                          <span className="text-xs opacity-50 font-mono">zayck.pages.dev</span>
                        </p>
                     </div>
                  </div>
@@ -611,7 +611,7 @@ function App() {
                  {/* GitHub */}
                  <div 
                     className="block p-12 border-2 border-gray-100 dark:border-gray-800 rounded-[2rem] relative group cursor-pointer hover:border-black dark:hover:border-white transition-colors duration-300"
-                    onClick={() => window.open('https://github.com/LuN3cy', '_blank')}
+                    onClick={() => window.open('https://github.com/zayck', '_blank')}
                  >
                     <Github size={48} className="mx-auto mb-6 text-gray-400 group-hover:text-black dark:group-hover:text-white transition-colors duration-300" />
                     {/* Custom Floating Color for Github Icon on Hover */}
@@ -625,7 +625,7 @@ function App() {
                       {content.githubLabel}
                     </h3>
                     <p className="text-lg opacity-70 text-gray-500 dark:text-gray-400 transition-colors duration-300">
-                      @LuN3cy
+                      @zayck
                     </p>
                  </div>
               </div>

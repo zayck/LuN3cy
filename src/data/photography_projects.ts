@@ -5,81 +5,27 @@ export const PHOTOGRAPHY_PROJECTS: Project[] = [
     id: 'p1',
     common: {
       category: 'Photography',
-      image: 'https://mmbiz.qpic.cn/mmbiz_jpg/MpZIibj0bjSym38IftGicAWNwhwavzH9hRqulRYy4XYt210iaN4wRicELqA79ywY3mmgyictP5C5NAJb5B9VhavibtMg/640?wx_fmt=jpeg&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1#imgIndex=1',
+      image: 'https://zayck-img.pages.dev/file/来自新世界/1765117838486_20131106134527_ezEve.thumb.1000_0.jpg',
     },
     zh: {
-      title: '风景',
-      subtitle: '',
-      description: '山河仍在，只是故人改',
-      role: '',
-      tags: [],
-      awards: [],
-      concept: "",
-      roleDetail: ""
+      title: '序言',
+      subtitle: '123',
+      description: '2',
+      role: 'd',
+      tags: ['a', 'b', 'c'],
+      awards: ["text2"],
+      concept: "text1",
+      roleDetail: "text"
     },
     en: {
-      title: 'Landscape',
-      subtitle: '',
-      description: 'Mountains May Depart',
-      role: '',
-      tags: [],
-      awards: [],
-      concept: "",
-      roleDetail: ""
+      title: 'foreword',
+      subtitle: '123',
+      description: '2',
+      role: 'd',
+      tags: ['a', 'b', 'c'],
+      awards: ["text2"],
+      concept: "text1",
+      roleDetail: "text"
     }
   },
-  {
-    id: 'p2',
-    common: {
-      category: 'Photography',
-      image: 'https://mmbiz.qpic.cn/mmbiz_jpg/MpZIibj0bjSym38IftGicAWNwhwavzH9hRcnbw6AdBMu1QHAdcibpxTfz5MhDESboc1Ny5NvXC90KTstEW33jDXTw/640?wx_fmt=jpeg&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1#imgIndex=37',
-    },
-    zh: {
-      title: '人文纪实',
-      subtitle: '',
-      description: '回忆与瞬间',
-      role: '',
-      tags: [],
-      awards: [],
-      concept: "",
-      roleDetail: ""
-    },
-    en: {
-      title: 'Documentary',
-      subtitle: '',
-      description: 'Memories and moments',
-      role: '',
-      tags: [],
-      awards: [],
-      concept: "",
-      roleDetail: ""
-    },
-  },
-  {
-    id: 'p3',
-    common: {
-      category: 'Photography',
-      image: 'https://mmbiz.qpic.cn/mmbiz_jpg/MpZIibj0bjSym38IftGicAWNwhwavzH9hRsYUjlBeYKR2Vib1fUpYS1icJaftdGyuPbg70E1WxswADYA4LtLdCgicNA/640?wx_fmt=jpeg&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1#imgIndex=52',
-    },
-    zh: {
-      title: '空间',
-      subtitle: '',
-      description: '那些一直塑造着我们的行为与感受的',
-      role: '',
-      tags: [],
-      awards: [],
-      concept: "",
-      roleDetail: ""
-    },
-    en: {
-      title: 'Space',
-      subtitle: '',
-      description: 'Those that have always shaped us',
-      role: '',
-      tags: [],
-      awards: [],
-      concept: "",
-      roleDetail: ""
-    }
-  }
 ];

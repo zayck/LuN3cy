@@ -6,9 +6,9 @@ import { ARTICLE_DATA } from './src/data/articles';
 export const CATEGORY_LABELS: Record<Language, Record<string, string>> = {
   zh: {
     'All': '全部',
-    'Videography': '动态影像', // Renamed
-    'Graphics & UI': '平面交互',
-    'Photography': '静态摄影', // Renamed
+    'Videography': '廿四', // Renamed
+    'Graphics & UI': 'OB教程',
+    'Photography': '草堂', // Renamed
     'Development': '应用开发'
   },
   en: {

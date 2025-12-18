@@ -10,7 +10,10 @@ import 'highlight.js/styles/github.css';
 import { generateArticleLabels } from '../constants';
 import { Language, Article } from '../types';
 import { useArticles } from '../src/data/articles';
-import { ArrowUpRight, ArrowDown, ArrowUp, BookOpen, Calendar, Filter, ArrowLeft, Copy, Check } from 'lucide-react';
+import { 
+  ArrowUpRight, ArrowDown, ArrowUp, BookOpen, Calendar, 
+  Filter, ArrowLeft, Copy, Check, Github, Tv, MessageCircle, Rss 
+} from 'lucide-react';
 
 interface ArticleSectionProps {
   language: Language;
@@ -138,54 +141,50 @@ export const ArticleSection: React.FC<ArticleSectionProps> = ({ language, startV
 
                 {/* Name */}
                 <div className="text-center mb-2">
-                  <h4 className="text-lg font-bold text-black dark:text-white">Zayck</h4>
-                  <p className="mt-2 mb-3 text-sm font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">系统 · 高效 · 实用</p>
+                  <h4 className="text-xl font-bold text-black dark:text-white">Zayck</h4>
+                  <p className="mt-2 mb-3 text-base font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">系统 · 高效 · 实用</p>
                 </div>
 
                 {/* Divider */}
                 <div className="w-full h-px bg-gray-200 dark:bg-gray-700 mb-2"></div>
 
                 {/* Social Icons */}
-                <div className="flex justify-center space-x-4 mt-auto">
+                <div className="flex justify-center space-x-8 mt-auto">
                   <a
                     href="https://github.com/zayck"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-black dark:hover:text-white transition-colors"
+                    className="text-gray-600 hover:text-black dark:hover:text-white transition-colors"
+                    title="GitHub"
                   >
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                    </svg>
+                    <Github size={18} />
                   </a>
                   <a
                     href="https://space.bilibili.com/341981702"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-black dark:hover:text-white transition-colors"
+                    className="text-gray-600 hover:text-black dark:hover:text-white transition-colors"
+                    title="Bilibili"
                   >
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M17.813 4.653h-.854c-.44 0-.91.044-1.378.13-.48.087-.956.247-1.326.491-.37.244-.666.564-.88.933-.213.37-.32.765-.32 1.174v.123c0 .44.107.834.32 1.204.214.37.51.69.88.934.37.244.846.404 1.326.49.468.087.938.132 1.378.132h.854c.44 0 .91-.045 1.378-.132.48-.086.956-.246 1.326-.49.37-.244.666-.564.88-.933.213-.37.32-.765.32-1.174v-.123c0-.44-.107-.834-.32-1.204-.214-.37-.51-.69-.88-.934-.37-.244-.846-.404-1.326-.49-.468-.086-.938-.131-1.378-.131zM12.64 4.653c-.44 0-.91.044-1.378.13-.48.087-.956.247-1.326.491-.37.244-.666.564-.88.933-.213.37-.32.765-.32 1.174v.123c0 .44.107.834.32 1.204.214.37.51.69.88.934.37.244.846.404 1.326.49.468.087.938.132 1.378.132.44 0 .91-.045 1.378-.132.48-.086.956-.246 1.326-.49.37-.244.666-.564.88-.933.213-.37.32-.765.32-1.174v-.123c0-.44-.107-.834-.32-1.204-.214-.37-.51-.69-.88-.934-.37-.244-.846-.404-1.326-.49-.468-.086-.938-.131-1.378-.131zM6.467 4.653h-.854c-.44 0-.91.044-1.378.13-.48.087-.956.247-1.326.491-.37.244-.666.564-.88.933-.213.37-.32.765-.32 1.174v.123c0 .44.107.834.32 1.204.214.37.51.69.88.934.37.244.846.404 1.326.49.468.087.938.132 1.378.132h.854c.44 0 .91-.045 1.378-.132.48-.086.956-.246 1.326-.49.37-.244.666-.564.88-.933.213-.37.32-.765.32-1.174v-.123c0-.44-.107-.834-.32-1.204-.214-.37-.51-.69-.88-.934-.37-.244-.846-.404-1.326-.49-.468-.086-.938-.131-1.378-.131z"/>
-                    </svg>
+                    <Tv size={18} />
                   </a>
                   <a
                     href="https://mp.weixin.qq.com/mp/homepage?__biz=MzU2MTI5MzE4OA==&hid=1&sn=356f3016aeac48fc034804fca1307349&scene=18#wechat_redirect"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-black dark:hover:text-white transition-colors"
+                    className="text-gray-600 hover:text-black dark:hover:text-white transition-colors"
+                    title="WeChat"
                   >
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.138 3.217 5.33-.094.324-.188.685-.188 1.047 0 .585.151.988.41 1.181-.384.645-.673 1.365-.673 2.188 0 1.657 1.297 3.012 2.916 3.012.461 0 .895-.089 1.307-.249l.6.749c.088.11.196.196.324.245.128.049.268.061.402.035l.598-.749c.413.16.846.249 1.307.249 1.619 0 2.916-1.355 2.916-3.012 0-.823-.289-1.543-.673-2.188.259-.193.41-.596.41-1.181 0-.362-.094-.723-.188-1.047C16.83 13.668 18 11.742 18 9.53c0-4.054-3.891-7.342-8.691-7.342zm2.889 10.878c-.461 0-.895.089-1.307.249l-.6-.749c-.088-.11-.196-.196-.324-.245-.128-.049-.268-.061-.402-.035l-.598.749c-.413-.16-.846-.249-1.307-.249-1.619 0-2.916 1.355-2.916 3.012 0 .823.289 1.543.673 2.188-.259.193-.41.596-.41 1.181 0 .362.094.723.188 1.047C1.17 15.862 0 17.788 0 20c0 4.054 3.891 7.342 8.691 7.342s8.691-3.288 8.691-7.342c0-2.212-1.17-4.138-3.217-5.33.094-.324.188-.685.188-1.047 0-.585-.151-.988-.41-1.181.384-.645.673-1.365.673-2.188 0-1.657-1.297-3.012-2.916-3.012z"/>
-                    </svg>
+                    <MessageCircle size={18} />
                   </a>
                   <a
                     href="https://zayck.pages.dev/rss.xml"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-black dark:hover:text-white transition-colors"
+                    className="text-gray-600 hover:text-black dark:hover:text-white transition-colors"
+                    title="RSS"
                   >
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M19.199 24C19.199 13.467 10.533 4.8 0 4.8V0c13.165 0 23.8 10.635 23.8 23.8h-4.601zM3.6 7.2v3.8c5.1 0 9.2 4.1 9.2 9.2h3.8c0-7.2-5.8-13-13-13zM7.2 16.8c0 1.68-1.32 3-3 3s-3-1.32-3-3 1.32-3 3-3 3 1.32 3 3z"/>
-                    </svg>
+                    <Rss size={18} />
                   </a>
                 </div>
               </div>
