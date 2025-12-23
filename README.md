@@ -13,7 +13,7 @@
 
 *   **WeChat Official/公众号**: 少阳手记、少阳研究所
 *   **RED/小红书**: 少阳手记
-*   **Bilibili**: [LuN3cy](https://space.bilibili.com/341981702)
+*   **Bilibili**: [Zayck-少阳](https://space.bilibili.com/341981702)
 *   **BLOG**: [Zayck' Blog](https://zayck.pages.dev)
 
 ---
