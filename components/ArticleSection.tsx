@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -12,7 +12,7 @@ import { Language, Article } from '../types';
 import { useArticles } from '../src/data/articles';
 import { 
   ArrowUpRight, ArrowDown, ArrowUp, BookOpen, Calendar, 
-  Filter, ArrowLeft, Copy, Check, Github, Tv, MessageCircle, Rss 
+  Filter, ArrowLeft, Copy, Check, Github, Tv, MessageCircle, Rss, ChevronRight, ChevronDown 
 } from 'lucide-react';
 
 interface ArticleSectionProps {
@@ -47,6 +47,42 @@ const parseHeadings = (content: string) => {
   }
 
   return headings;
+};
+
+type TocNode = {
+  id: string;
+  text: string;
+  level: number;
+  children: TocNode[];
+};
+
+const buildTocTree = (headings: { level: number; text: string; id: string }[]): TocNode[] => {
+  const roots: TocNode[] = [];
+  const stack: TocNode[] = [];
+
+  for (const heading of headings) {
+    const node: TocNode = {
+      id: heading.id,
+      text: heading.text,
+      level: heading.level,
+      children: []
+    };
+
+    while (stack.length > 0 && stack[stack.length - 1].level >= node.level) {
+      stack.pop();
+    }
+
+    const parent = stack[stack.length - 1];
+    if (parent) {
+      parent.children.push(node);
+    } else {
+      roots.push(node);
+    }
+
+    stack.push(node);
+  }
+
+  return roots;
 };
 
 // 自定义代码块组件
@@ -95,6 +131,37 @@ export const ArticleSection: React.FC<ArticleSectionProps> = ({ language, startV
   const [filter, setFilter] = useState<string>('All');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+  const [tocExpandedById, setTocExpandedById] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (!selectedArticle) return;
+    requestAnimationFrame(() => {
+      window.scrollTo(0, 0);
+    });
+  }, [selectedArticle?.id]);
+
+  useEffect(() => {
+    if (!selectedArticle) {
+      setTocExpandedById({});
+      return;
+    }
+
+    const headings = parseHeadings(selectedArticle.content || '');
+    const tree = buildTocTree(headings);
+
+    const nextExpanded: Record<string, boolean> = {};
+    const walk = (nodes: TocNode[]) => {
+      for (const node of nodes) {
+        if (node.level <= 2 && node.children.length > 0) {
+          nextExpanded[node.id] = true;
+        }
+        walk(node.children);
+      }
+    };
+    walk(tree);
+
+    setTocExpandedById(nextExpanded);
+  }, [selectedArticle?.id]);
 
   const { articles: currentArticles, loading } = useArticles();
   const categories = ['All', ...Array.from(new Set(currentArticles.map(a => a.category)))];
@@ -119,6 +186,78 @@ export const ArticleSection: React.FC<ArticleSectionProps> = ({ language, startV
 
   if (selectedArticle) {
     const headings = parseHeadings(selectedArticle.content || '');
+    const tocTree = buildTocTree(headings);
+
+    const scrollToHeading = (headingId: string) => {
+      const element = document.getElementById(headingId);
+      if (!element) return;
+
+      const offset = 100;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    };
+
+    const renderTocNodes = (nodes: TocNode[]) => {
+      return nodes.map((node) => {
+        const hasChildren = node.children.length > 0;
+        const isExpanded = !!tocExpandedById[node.id];
+
+        return (
+          <div key={node.id}>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => scrollToHeading(node.id)}
+                className={
+                  `flex-1 text-left px-4 py-3 rounded-lg transition-all duration-300 text-base font-medium ` +
+                  `hover:bg-gray-100 dark:hover:bg-gray-800 ` +
+                  `${node.level === 1 ? 'text-black dark:text-white font-bold' : ''} ` +
+                  `${node.level === 2 ? 'text-gray-700 dark:text-gray-300' : ''} ` +
+                  `${node.level === 3 ? 'text-gray-600 dark:text-gray-400' : ''} ` +
+                  `${node.level >= 4 ? 'text-gray-500 dark:text-gray-500' : ''}`
+                }
+                style={{ paddingLeft: `${(node.level - 1) * 16 + 16}px` }}
+              >
+                {node.text}
+              </button>
+
+              {hasChildren && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setTocExpandedById((prev) => ({
+                      ...prev,
+                      [node.id]: !prev[node.id]
+                    }));
+                  }}
+                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400"
+                  aria-label={
+                    isExpanded
+                      ? (language === 'zh' ? '收起子目录' : 'Collapse section')
+                      : (language === 'zh' ? '展开子目录' : 'Expand section')
+                  }
+                >
+                  {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                </button>
+              )}
+            </div>
+
+            {hasChildren && isExpanded && (
+              <div>
+                {renderTocNodes(node.children)}
+              </div>
+            )}
+          </div>
+        );
+      });
+    };
 
     return (
       <div className="w-full max-w-[96vw] mx-auto pb-20">
@@ -190,56 +329,30 @@ export const ArticleSection: React.FC<ArticleSectionProps> = ({ language, startV
               </div>
             </div>
 
-            {/* Table of Contents */}
-            {headings.length > 0 && (
-              <div className="bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-lg">
-                <h3 className="text-2xl font-black mb-6 flex items-center gap-2">
-                  <BookOpen size={20} />
-                  {language === 'zh' ? '目录' : 'Contents'}
-                </h3>
-                <div className="flex flex-col space-y-2">
-                  {headings.map((heading, index) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        const element = document.getElementById(heading.id);
-                        if (element) {
-                          // 添加偏移量，避免标题被导航栏遮挡
-                          const offset = 100; // 像素偏移量
-                          const elementPosition = element.getBoundingClientRect().top;
-                          const offsetPosition = elementPosition + window.pageYOffset - offset;
+            {/* Sticky: Table of Contents + Back to List */}
+            <div className="lg:sticky lg:top-32">
+              <div className="space-y-4 max-h-[calc(100vh-9rem)] overflow-y-auto no-scrollbar">
+                {headings.length > 0 && (
+                  <div className="bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-xl p-6 shadow-lg">
+                    <h3 className="text-2xl font-black mb-6 flex items-center gap-2">
+                      <BookOpen size={20} />
+                      {language === 'zh' ? '目录' : 'Contents'}
+                    </h3>
 
-                          window.scrollTo({
-                            top: offsetPosition,
-                            behavior: 'smooth'
-                          });
-                        }
-                      }}
-                      className={`
-                        text-left px-4 py-3 rounded-lg transition-all duration-300 text-base font-medium
-                        hover:bg-gray-100 dark:hover:bg-gray-800
-                        ${heading.level === 1 ? 'text-black dark:text-white font-bold' : ''}
-                        ${heading.level === 2 ? 'text-gray-700 dark:text-gray-300 ml-2' : ''}
-                        ${heading.level >= 3 ? 'text-gray-600 dark:text-gray-400 ml-4' : ''}
-                      `}
-                      style={{ paddingLeft: `${(heading.level - 1) * 16 + 16}px` }}
-                    >
-                      {heading.text}
-                    </button>
-                  ))}
-                </div>
+                    <div className="flex flex-col space-y-2">
+                      {renderTocNodes(tocTree)}
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  onClick={() => setSelectedArticle(null)}
+                  className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-base font-bold w-full"
+                >
+                  <ArrowLeft size={16} />
+                  {language === 'zh' ? '返回列表' : 'Back to List'}
+                </button>
               </div>
-            )}
-
-            {/* Back to List Button */}
-            <div className="mt-8">
-              <button
-                onClick={() => setSelectedArticle(null)}
-                className="flex items-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-base font-bold w-full"
-              >
-                <ArrowLeft size={16} />
-                {language === 'zh' ? '返回列表' : 'Back to List'}
-              </button>
             </div>
           </div>
 
@@ -415,9 +528,13 @@ export const ArticleSection: React.FC<ArticleSectionProps> = ({ language, startV
                 className="group cursor-pointer"
                 onClick={() => {
                   if (startViewTransition) {
-                    startViewTransition(() => setSelectedArticle(article));
+                    startViewTransition(() => {
+                      setSelectedArticle(article);
+                      window.scrollTo(0, 0);
+                    });
                   } else {
                     setSelectedArticle(article);
+                    window.scrollTo(0, 0);
                   }
                 }}
               >

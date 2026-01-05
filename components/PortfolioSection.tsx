@@ -113,8 +113,8 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ language, ex
   return (
     <div className="w-full max-w-[96vw] mx-auto pb-20">
       
-      {/* Brutalist Filter Bar - Sticky */}
-      <div className="flex flex-wrap gap-4 md:gap-8 mb-12 md:mb-16 border-b-2 border-black dark:border-white pb-4 md:pb-8 sticky top-20 md:top-24 bg-white/95 dark:bg-black/95 backdrop-blur-sm z-30 pt-4 transition-colors duration-300 overflow-x-auto no-scrollbar">
+      {/* Brutalist Filter Bar */}
+      <div className="flex flex-wrap gap-4 md:gap-8 mb-12 md:mb-16 border-b-2 border-black dark:border-white pb-4 md:pb-8 bg-white/95 dark:bg-black/95 backdrop-blur-sm pt-4 transition-colors duration-300 overflow-x-auto no-scrollbar">
         {categories.map(cat => (
           <button
             key={cat}
