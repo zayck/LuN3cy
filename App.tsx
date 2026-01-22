@@ -349,17 +349,6 @@ function App() {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'dashboard':
-        return (
-          <>
-            <HeroSection 
-              onNavigate={(tab) => startViewTransition(() => setActiveTab(tab))} 
-              onCategorySelect={handleHeroNavigation}
-              language={language} 
-            />
-            <PortfolioSection language={language} externalFilter={portfolioCategory} />
-          </>
-        );
       case 'portfolio':
         return (
           <div className="pt-20 w-full max-w-[96vw] mx-auto">
@@ -374,10 +363,16 @@ function App() {
              <PortfolioSection language={language} externalFilter={portfolioCategory} />
           </div>
         );
-      case 'articles':
+      case 'shao-yang-notes':
         return (
           <div className="pt-20 w-full max-w-[96vw] mx-auto">
-              <ArticleSection language={language} startViewTransition={startViewTransition} />
+              <ArticleSection language={language} startViewTransition={startViewTransition} articleType="notes" />
+           </div>
+        );
+      case 'shao-yang-institute':
+        return (
+          <div className="pt-20 w-full max-w-[96vw] mx-auto">
+              <ArticleSection language={language} startViewTransition={startViewTransition} articleType="institute" />
            </div>
         );
       case 'about':

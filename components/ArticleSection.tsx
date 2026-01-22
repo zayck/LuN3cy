@@ -9,15 +9,16 @@ import 'katex/dist/katex.min.css';
 import 'highlight.js/styles/github.css';
 import { generateArticleLabels } from '../constants';
 import { Language, Article } from '../types';
-import { useArticles } from '../src/data/articles';
+import { useArticles, useShaoYangNotes, useShaoYangInstitute, ARTICLES_PAGE_DATA, SHAOYANG_NOTES_DATA, SHAOYANG_INSTITUTE_DATA } from '../src/data/articles';
 import { 
   ArrowUpRight, ArrowDown, ArrowUp, BookOpen, Calendar, 
-  Filter, ArrowLeft, Copy, Check, Github, Tv, MessageCircle, Rss, ChevronRight, ChevronDown 
+  Filter, ArrowLeft, Copy, Check, Github, Tv, MessageCircle, Rss, ChevronRight, ChevronDown, X, List
 } from 'lucide-react';
 
 interface ArticleSectionProps {
   language: Language;
   startViewTransition?: (update: () => void) => void;
+  articleType?: 'all' | 'notes' | 'institute';
 }
 
 // 生成标题ID的工具函数
@@ -127,11 +128,12 @@ const CodeBlock = ({ children, className, ...props }: any) => {
   );
 };
 
-export const ArticleSection: React.FC<ArticleSectionProps> = ({ language, startViewTransition }) => {
+export const ArticleSection: React.FC<ArticleSectionProps> = ({ language, startViewTransition, articleType = 'all' }) => {
   const [filter, setFilter] = useState<string>('All');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [tocExpandedById, setTocExpandedById] = useState<Record<string, boolean>>({});
+  const [mobileTocOpen, setMobileTocOpen] = useState(false);
 
   useEffect(() => {
     if (!selectedArticle) return;
@@ -163,7 +165,18 @@ export const ArticleSection: React.FC<ArticleSectionProps> = ({ language, startV
     setTocExpandedById(nextExpanded);
   }, [selectedArticle?.id]);
 
-  const { articles: currentArticles, loading } = useArticles();
+  const { articles: currentArticles, loading } = articleType === 'notes' 
+    ? useShaoYangNotes() 
+    : articleType === 'institute' 
+    ? useShaoYangInstitute() 
+    : useArticles();
+  
+  const pageData = articleType === 'notes' 
+    ? SHAOYANG_NOTES_DATA[language] 
+    : articleType === 'institute' 
+    ? SHAOYANG_INSTITUTE_DATA[language] 
+    : ARTICLES_PAGE_DATA[language];
+
   const categories = ['All', ...Array.from(new Set(currentArticles.map(a => a.category)))];
   const ARTICLE_LABELS = generateArticleLabels(currentArticles);
 
@@ -261,6 +274,43 @@ export const ArticleSection: React.FC<ArticleSectionProps> = ({ language, startV
 
     return (
       <div className="w-full max-w-[96vw] mx-auto pb-20">
+
+        {/* Mobile TOC Button - Only show when article has headings */}
+        {headings.length > 0 && (
+          <button
+            onClick={() => setMobileTocOpen(true)}
+            className="lg:hidden fixed bottom-36 right-6 z-40 bg-white/90 dark:bg-[#090C14]/90 text-black dark:text-white p-3 rounded-full shadow-lg border border-white/20 dark:border-white/20 hover:scale-110 transition-transform"
+            title={language === 'zh' ? '目录' : 'Table of Contents'}
+          >
+            <List size={24} className="text-zinc-600 dark:text-zinc-400" />
+          </button>
+        )}
+
+        {/* Mobile TOC Modal */}
+        {mobileTocOpen && (
+          <div className="lg:hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" onClick={() => setMobileTocOpen(false)}>
+            <div 
+              className="absolute bottom-36 right-6 w-[300px] max-h-[70vh] backdrop-blur-xl bg-white/95 dark:bg-[#090C14]/60 border border-white/20 dark:border-white/20 shadow-2xl rounded-3xl p-5 overflow-y-auto animate-scale-in"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.5)] animate-pulse"></span>
+                  <span className="text-[10px] font-bold text-zinc-500/80 dark:text-zinc-400/80 uppercase tracking-widest">Contents</span>
+                </div>
+                <button
+                  onClick={() => setMobileTocOpen(false)}
+                  className="text-zinc-400/80 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="flex flex-col space-y-2">
+                {renderTocNodes(tocTree)}
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-4 justify-center">
           {/* Left Sidebar - Author Card and Table of Contents */}
@@ -447,10 +497,10 @@ export const ArticleSection: React.FC<ArticleSectionProps> = ({ language, startV
       {!selectedArticle && (
         <div className="mb-24 flex flex-col items-center text-center">
           <h1 className="text-[8vw] leading-none font-black mb-8 text-black dark:text-white transition-colors duration-300">
-            {language === 'zh' ? '文章' : 'Articles'}
+            {pageData.title}
           </h1>
           <p className="text-2xl text-gray-500 dark:text-gray-400 max-w-2xl font-medium transition-colors duration-300">
-            {language === 'zh' ? '个人思考、学习分享与生活记录。' : 'Thoughts, learning journey, and life records.'}
+            {pageData.description}
           </p>
         </div>
       )}
@@ -578,7 +628,7 @@ export const ArticleSection: React.FC<ArticleSectionProps> = ({ language, startV
                         <div className="flex items-center gap-3 text-xs md:text-sm font-mono text-gray-400 dark:text-gray-500 border-t border-gray-100 dark:border-gray-800 pt-3 mt-2">
                              <span>{article.date || 'No Date'}</span>
                              <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700"></span>
-                             <span className="truncate hidden md:inline">
+                             <span className="truncate">
                                {article.tags && article.tags.length > 0 ? article.tags.join(', ') : 'Read on WeChat'}
                              </span>
                         </div>

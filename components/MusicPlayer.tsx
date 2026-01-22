@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Music, X, Play, Pause, SkipForward, SkipBack, Volume2, VolumeX } from 'lucide-react';
-import ElasticSlider from './ElasticSlider';
+import { Music, X, Play, Pause, SkipForward, SkipBack } from 'lucide-react';
 import { METING_CONFIG } from '../constants';
 
 type Song = {
@@ -21,14 +20,19 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ initialVisible = false
   const [showPrompt, setShowPrompt] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
-  const [isMuted, setIsMuted] = useState(false);
-  const [volume, setVolume] = useState(0.5);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [musicPlaylist, setMusicPlaylist] = useState<Song[]>([]);
   
   const audioRef = useRef<HTMLAudioElement>(null);
   const currentSong = musicPlaylist[currentSongIndex];
+
+  const formatTime = (time: number) => {
+    if (isNaN(time)) return '0:00';
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
 
   const [hasInteracted, setHasInteracted] = useState(false);
   
@@ -44,13 +48,11 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ initialVisible = false
 
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.volume = isMuted ? 0 : volume;
       if (isPlaying) {
         // Need to handle autoplay restrictions
         const playPromise = audioRef.current.play();
         if (playPromise !== undefined) {
           playPromise.catch(error => {
-            console.log("Autoplay prevented:", error);
             setIsPlaying(false);
           });
         }
@@ -58,7 +60,7 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ initialVisible = false
         audioRef.current.pause();
       }
     }
-  }, [isPlaying, currentSongIndex, isMuted, volume]);
+  }, [isPlaying, currentSongIndex]);
 
   const [isClosing, setIsClosing] = useState(false);
 
@@ -93,14 +95,6 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ initialVisible = false
     }
   };
 
-  const handleVolumeSliderChange = (newVal: number) => {
-    const newVolume = newVal / 1000;
-    setVolume(newVolume);
-    if (newVolume > 0 && isMuted) {
-      setIsMuted(false);
-    }
-  };
-
   const handleSeekStart = () => {
     setIsSeeking(true);
   };
@@ -130,7 +124,6 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ initialVisible = false
           .replace(':id', METING_CONFIG.id)
           .replace(':r', Math.random().toString());
 
-        console.log('Fetching music from:', apiUrl);
         const response = await fetch(apiUrl);
         
         if (!response.ok) {
@@ -155,8 +148,7 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ initialVisible = false
           setCurrentSongIndex(0);
         }
       } catch (error) {
-        console.error("Failed to fetch music playlist:", error);
-        
+
         // Try fallback APIs if available
         if (METING_CONFIG.fallbackApis && METING_CONFIG.fallbackApis.length > 0) {
           for (const fallbackApi of METING_CONFIG.fallbackApis) {
@@ -166,7 +158,6 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ initialVisible = false
                 .replace(':type', METING_CONFIG.type)
                 .replace(':id', METING_CONFIG.id);
 
-              console.log('Trying fallback API:', apiUrl);
               const response = await fetch(apiUrl);
               
               if (!response.ok) {
@@ -192,7 +183,6 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ initialVisible = false
 
               break; // Stop trying fallbacks if successful
             } catch (fallbackError) {
-              console.error(`Failed to fetch from fallback API: ${fallbackApi}`, fallbackError);
             }
           }
         }
@@ -212,7 +202,7 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ initialVisible = false
   }, []);
 
   return (
-    <div className="fixed right-6 bottom-6 z-50 flex flex-col items-end gap-4 pointer-events-none">
+    <div className="fixed right-6 bottom-4 z-50 flex flex-col items-end gap-4 pointer-events-none">
       
       {/* Hidden Audio Element - Always mounted */}
       {currentSong && (
@@ -228,7 +218,6 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ initialVisible = false
           onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
           onEnded={handleNext}
           onError={() => {
-            console.error("Audio load failed for song:", currentSong.title);
             setIsPlaying(false);
           }}
         />
@@ -268,7 +257,7 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ initialVisible = false
             <Music className={`w-5 h-5 ${isPlaying ? 'animate-spin-slow' : 'group-hover:animate-spin-slow'}`} />
           </button>
         ) : (
-          <div className={`backdrop-blur-xl bg-white/70 dark:bg-black/60 border border-white/20 dark:border-white/10 shadow-2xl rounded-3xl p-5 w-[300px] origin-bottom-right overflow-hidden ${isClosing ? 'animate-scale-out' : 'animate-scale-in'}`}>
+          <div className={`backdrop-blur-xl bg-white/70 dark:bg-[#090C14]/60 border border-white/20 dark:border-white/20 shadow-2xl rounded-3xl p-5 w-[300px] origin-bottom-right overflow-hidden ${isClosing ? 'animate-scale-out' : 'animate-scale-in'}`}>
             
             {/* Ambient Background Gradient */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-orange-400/20 rounded-full blur-3xl -z-10 pointer-events-none translate-x-10 -translate-y-10"></div>
@@ -343,21 +332,9 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ initialVisible = false
               </div>
 
               <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 flex-1">
-                  <ElasticSlider 
-                    leftIcon={
-                      <button onClick={() => setIsMuted(!isMuted)} className="hover:text-zinc-800 dark:hover:text-white transition-colors">
-                        {isMuted || volume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                      </button>
-                    }
-                    value={(isMuted ? 0 : volume) * 1000}
-                    maxValue={1000}
-                    isStepped
-                    stepSize={10}
-                    onChange={handleVolumeSliderChange}
-                  />
+                <div className="text-[10px] font-bold text-zinc-500/80 dark:text-zinc-400/80 uppercase tracking-widest tabular-nums">
+                  {formatTime(progress)} / {formatTime(duration)}
                 </div>
-
                 <div className="flex items-center gap-4 shrink-0">
                   <button onClick={handlePrev} className="text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-white transition-colors hover:scale-110 transform">
                     <SkipBack className="w-5 h-5 fill-current" />
@@ -426,6 +403,31 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ initialVisible = false
         }
         .animate-scale-out {
           animation: scale-out 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: black;
+          cursor: pointer;
+        }
+        .dark input[type="range"]::-webkit-slider-thumb {
+          background: white;
+        }
+        input[type="range"]::-moz-range-thumb {
+          -moz-appearance: none;
+          appearance: none;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: black;
+          cursor: pointer;
+          border: none;
+        }
+        .dark input[type="range"]::-moz-range-thumb {
+          background: white;
         }
       `}</style>
     </div>
